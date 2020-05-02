@@ -17,8 +17,8 @@ module HackerNews
   end
 
   def self.time_difference_between_now_and_date_last_num_one_in_minutes date
-    #(Time.now - date.to_time) / 60
-    (Time.now - date) / 60
+    (Time.now - date.to_time) / 60
+    #(Time.now - date) / 60
   end
 
 end

@@ -5,7 +5,7 @@ class SearchStory < ActiveType::Object
   attribute :hn_id, :integer
   attribute :description, :text
   attribute :time_at_num_one, :integer
-  attribute :date_seen, :time
+  attribute :date_seen, :datetime
   attribute :href, :text
 
   def self.search_description(search_string)
