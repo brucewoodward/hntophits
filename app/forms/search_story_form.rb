@@ -4,37 +4,43 @@ class SearchStoryForm < ActiveType::Object
   attribute :order_column_name, :string
   attribute :order_direction, :string
 
-  validates :order_direction, inclusion: { in: %w( asc desc ) }
-  validates :order_column_name, inclusion: { in: %w( time_at_num_one last_seen ) }
-
-  def fulfill
-    case self.order_column_name
-    when nil
-      SearchStory.search_description(self.search_string)
-    when "time_at_num_one"
-      SearchStory.search_description_order_by_time_at_num_one(self.search_string, self.order_direction.to_sym)
-    when "last_seen"
-      SearchStory.search_description_order_by_date_seen(self.search_string, self.order_direction.to_sym)
-    else
-      raise ArgumentError, "Story.search: bad arg 'order_by' #{order_by}"
+  def self.default(arg)
+    case arg
+    when :search_string
+      ""
+    when :order_direction
+      "desc"
+    when :order_column_name
+      "time_at_num_one"
     end
   end
 
-  def initialize(*arg)
-    super
-    set_defaults
+  def fulfill
+    Rails.logger.info "called fulfill"
+    Rails.logger.info "self.search_string #{self.search_string}"
+    Rails.logger.info "self.order_direction #{self.order_direction}"
+
+    case @order_column_name.to_sym
+    when nil
+      SearchStory.search_description(self.search_string)
+    when :time_at_num_one
+      SearchStory.search_description_order_by_time_at_num_one(self.search_string, self.order_direction)
+    when :last_seen
+      SearchStory.search_description_order_by_date_seen(self.search_string, self.order_direction)
+    else
+      raise ArgumentError, "Story.search: bad arg 'order_column_name' #{order_column_name}"
+    end
   end
 
-  private
-
-  def set_defaults
-    toggle_direction
-    self.order_column_name ||= 'time_at_num_one'
-    self.search_string ||= ""
+  def initialize(args)
+    @search_string = args.fetch(:search_string)
+    @order_column_name = args.fetch(:order_column_name)
+    @order_direction = args.fetch(:order_direction)
+    super
   end
 
   def toggle_direction
-    case self.order_direction
+    case @order_direction
     when nil
       self.order_direction = 'asc'
     when 'asc'

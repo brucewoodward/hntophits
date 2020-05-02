@@ -1,6 +1,6 @@
 .search-box
   = form_tag '/search_stories', method: :get do
     .form-inline
-      = search_field_tag :search_string, @search_story.search_string, placeholder: 'Search...'
-      = hidden_field_tag :order_direction, @search_story.order_direction
-      = hidden_field_tag :order_column_name, @search_story.order_column_name
+      = search_field_tag :search_string, @search_story && @search_story.search_string || SearchStoryForm.default(:search_string), placeholder: 'Search...'
+      = hidden_field_tag :order_direction, SearchStoryForm.default(:order_direction)
+      = hidden_field_tag :order_column_name, SearchStoryForm.default(:order_column_name)

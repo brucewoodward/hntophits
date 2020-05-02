@@ -7,9 +7,9 @@
       .search-header
         %p
           %span.heading.last-seen
-            = link_to "Last Seen", action: :index, order_direction: @search_story.order_direction, search_string: @search_story.search_string, order_column_name: 'last_seen'
+            = link_to "Last Seen", action: :index, order_direction: @search_story.toggle_direction, search_string: @search_story.search_string, order_column_name: 'last_seen'
           %span.heading.time-at-num-one
-            = link_to "Time at #1", action: :index, order_direction: @search_story.order_direction, search_string: @search_story.search_string, order_column_name: 'time_at_num_one'
+            = link_to "Time at #1", action: :index, order_direction: @search_story.toggle_direction, search_string: @search_story.search_string, order_column_name: 'time_at_num_one'
           %span.heading.description
             Story
       .stories
