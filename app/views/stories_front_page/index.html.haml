@@ -16,11 +16,11 @@
                 = link_to 'Trending Stories', url_for(stories_path)
             %li.pull-right.time-frame
               %ul.list-inline
-                %li.h5{class: ('underlined' if !params.has_key?(:time_frame) || params[:time_frame] == 'week')}
+                %li.h5{class: (underlined_element? 'week')}
                   = link_to 'Week', controller: 'stories_front_page', action: :index, time_frame: 'week'
-                %li.h5{class: ('underlined' if params.has_key?(:time_frame) && params[:time_frame] == 'month')}
+                %li.h5{class: (underlined_element? 'month')}
                   = link_to 'Month', controller: 'stories_front_page', action: :index, time_frame: 'month'
-                %li.h5{class: ('underlined' if params.has_key?(:time_frame) && params[:time_frame] == 'alltime')}
+                %li.h5{class: (underlined_element? 'alltime')}
                   = link_to 'All', controller: 'stories_front_page', action: :index, time_frame: 'alltime'
         - @stories.each do |story|
           = render partial: 'stories/story', locals: { story: story, past_tense: false }
