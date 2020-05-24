@@ -12,8 +12,8 @@ module HackerNews
     # process_latest_hn_num_one expects the story to exist.
     story_from_db = HackerNews.process_story(story.new(hn_id: hn_id,
                                              description: description,
-                                             href: href), date: time)
-    HackerNews.process_latest_hn_num_one(story: story_from_db, date: time)
+                                             href: href), date: date)
+    HackerNews.process_latest_hn_num_one(story: story_from_db, date: date)
     HackerNews.process_almost_stories(stories: almost_stories,
                                       dbstory: story_from_db)
   end
