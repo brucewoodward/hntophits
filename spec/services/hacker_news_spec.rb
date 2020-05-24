@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe HackerNews do
 
+  story = Struct.new(:hn_id, :href, :description)
+
   context "process_latest_hn_num_one: there is a new story at the top" do
 
     it "should have a new story as number one in top_hits" do
       current_top_story = create(:story)
       create(:top_hit, story: current_top_story, date_seen: Time.now)
-      new_top_story = build(:story, hn_id: 123456789)
-      HackerNews.process_latest_hn_num_one(hn_id: new_top_story.hn_id, date: Time.now + 1.minute,
-                                   href: new_top_story.href, description: new_top_story.description)
+      HackerNews.process_latest_hn_num_one(story: FactoryBot.create(:story, hn_id: 123456789),
+																									date: Time.now + 1.minute)
       expect(TopHit.current_top_hit.story.hn_id).to eq 123456789
     end
 
@@ -19,46 +20,56 @@ RSpec.describe HackerNews do
 
   context "process_latest_hn_num_one: there isn't new story at the top" do
     it "should have added more time to the current top story in top_hits" do
-      current_top_story = create(:story, hn_id: 656565, time_at_num_one: 1)
-      create(:top_hit, story: current_top_story, date_seen: Time.now)
+      current_top_story_raw = story.new(656565, "http://people.com", "description")
+      current_top_story = HackerNews.process_story(story: current_top_story_raw, date: Time.now)
+      HackerNews.process_latest_hn_num_one(story: current_top_story, date: Time.now)
       expect(current_top_story.time_at_num_one).to eq 1
-      HackerNews.process_latest_hn_num_one(hn_id: current_top_story.hn_id, date: Time.now,
-                                   href: current_top_story.href, description: current_top_story.description)
+      expect(TopHit.current_top_hit.story.hn_id).to eq 656565
+      expect(TopHit.current_top_hit.story.time_at_num_one).to eq 1
+      current_top_story = HackerNews.process_story(story: current_top_story_raw,
+                                                   date: Time.now + 1.minute)
+      HackerNews.process_latest_hn_num_one(story: current_top_story, date: Time.now + 1.minute)
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
       expect(TopHit.current_top_hit.story.time_at_num_one).to eq 2
-      HackerNews.process_latest_hn_num_one(hn_id: current_top_story.hn_id, date: Time.now + 1.minute,
-                                   href: current_top_story.href, description: current_top_story.description)
-      expect(TopHit.current_top_hit.story.hn_id).to eq 656565
-      expect(TopHit.current_top_hit.story.time_at_num_one).to eq 3
     end
   end
 
   context "simulate the current story getting more time at number one followed by a new story entering the picture" do
     it "should have a new story as number one in top_hits" do
-      current_top_story = create(:story, hn_id: 656565, time_at_num_one: 1)
-      create(:top_hit, story: current_top_story, date_seen: Time.now)
-      HackerNews.process_latest_hn_num_one(hn_id: current_top_story.hn_id, date: Time.now,
-                                   href: current_top_story.href, description: current_top_story.description)
+      time = Time.now
+      current_top_story_raw = story.new(656565, "http://poop.com", "garbage")
+
+      expect(Story.count).to eq 0
+      current_top_story = HackerNews.process_story(story: current_top_story_raw, date: time)
+      expect(Story.count).to eq 1
+      HackerNews.process_latest_hn_num_one(story: current_top_story, date: time)
+      expect(TopHit.current_top_hit.story.hn_id).to eq 656565
+      expect(TopHit.current_top_hit.story.time_at_num_one).to eq 1
+
+      current_top_story = HackerNews.process_story(story: current_top_story_raw,
+                                                   date: time + 1.minute)
+      HackerNews.process_latest_hn_num_one(story: current_top_story,
+                                           date: time + 1.minute)
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
       expect(TopHit.current_top_hit.story.time_at_num_one).to eq 2
-      HackerNews.process_latest_hn_num_one(hn_id: current_top_story.hn_id, date: Time.now + 1.minute,
-                                   href: current_top_story.href, description: current_top_story.description)
-      expect(TopHit.current_top_hit.story.hn_id).to eq 656565
-      expect(TopHit.current_top_hit.story.time_at_num_one).to eq 3
-      current_top_story = create(:story)
-      create(:top_hit, story: current_top_story, date_seen: Time.now)
-      new_top_story = build(:story, hn_id: 123456789)
-      HackerNews.process_latest_hn_num_one(hn_id: new_top_story.hn_id, date: Time.now + 1.minute,
-                                   href: new_top_story.href, description: new_top_story.description)
-      expect(TopHit.current_top_hit.story.hn_id).to eq 123456789
+
+      new_top_story_raw = story.new(88888, "http://newtopstory.com", "blahblah")
+      expect(Story.count).to eq 1
+      new_top_story = HackerNews.process_story(story: new_top_story_raw,
+                                               date: time + 2.minutes)
+      expect(Story.count).to eq 2
+      HackerNews.process_latest_hn_num_one(story: new_top_story,
+                                           date: time + 2.minutes)
+      expect(TopHit.current_top_hit.story.hn_id).to eq 88888
     end
   end
 
   context "make the update of the database fail to exercise the transaction" do
 
     it "should raise an exception when the attributes to Story are invalid" do
+      s = OpenStruct.new(id: nil, hn_id: "string", href: nil, description: nil)
       expect{
-        HackerNews.process_latest_hn_num_one(hn_id: nil, date: nil, description: nil, href: nil)
+        HackerNews.process_latest_hn_num_one(story: s, date: Time.now)
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 

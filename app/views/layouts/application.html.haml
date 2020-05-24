@@ -25,4 +25,6 @@
                 = render partial: 'search_stories/form'
               %li
                 %a(href='https://github.com/brucewoodward/hntophits') Source code
+              %li
+                = link_to 'Almost', controller: :almost_stories, action: :index
       = yield

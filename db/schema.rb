@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160704015854) do
+ActiveRecord::Schema.define(version: 20200524024101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "almost_stories", force: :cascade do |t|
+    t.integer "hn_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "href"
+    t.string "description"
+    t.index ["hn_id"], name: "index_almost_stories_on_hn_id"
+  end
 
   create_table "stories", id: :serial, force: :cascade do |t|
     t.integer "hn_id"
@@ -21,7 +30,7 @@ ActiveRecord::Schema.define(version: 20160704015854) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer "time_at_num_one", default: 1
+    t.integer "time_at_num_one", default: 0
     t.index ["hn_id"], name: "index_stories_on_hn_id"
   end
 

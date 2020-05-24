@@ -5,11 +5,35 @@
 
 module HackerNews
 
-  def self.process_latest_hn_num_one(hn_id:, date:, href:, description:)
+  def self.main(hn_id: hn_id, href: href, description: description,
+                almost_stories: almost_stories, date: time)
+    story = Struct.new(:hn_id, :description, :href)
+    # order here is critical, process_story still will create the story if needed.
+    # process_latest_hn_num_one expects the story to exist.
+    story_from_db = HackerNews.process_story(story.new(hn_id: hn_id,
+                                             description: description,
+                                             href: href), date: time)
+    HackerNews.process_latest_hn_num_one(story: story_from_db, date: time)
+    HackerNews.process_almost_stories(stories: almost_stories,
+                                      dbstory: story_from_db)
+  end
+  
+  def self.process_story(story:, date:)
+    Rails.logger.info "process_story: story #{story}"
+    story = Story.transaction do
+      Story.process(hn_id: story.hn_id, date: date, href: story.href,
+                    description: story.description)
+    end
+  end
+
+  def self.process_latest_hn_num_one(story:, date:)
     Story.transaction do
-      story = Story.process(hn_id: hn_id, date: date, href: href, description: description)
       TopHit.process_latest_top_story(story_id: story.id, date: date)
     end
+  end
+
+  def self.process_almost_stories(stories:, dbstory:)
+    Story.process_almost_stories(stories, dbstory)
   end
 
   def self.build_hacker_news_href hn_id

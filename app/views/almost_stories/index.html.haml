@@ -1,0 +1,7 @@
+.row
+  .col-md-12
+    .stories
+      %h2 Stories that almost made it to #1
+      - @stories.each do |story|
+        = render partial: 'almost_stories/story', locals: { story: story, past_tense: false }
+    = paginate @stories

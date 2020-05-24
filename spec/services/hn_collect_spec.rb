@@ -216,7 +216,7 @@ describe HNCollect do
 
   context "trigger Net::ReadTimeout exception" do
     it "will exercise the Net::ReadTimeout exception and check for proper handling" do
-      expect(HNCollect).to receive(:get_top_hit) { raise Net::ReadTimeout }
+      expect(HNCollect).to receive(:get_top_hit_stories) { raise Net::ReadTimeout }
       expect(HNCollect).to receive(:log_error).with(/Network Time out/)
       HNCollect.load_data_from_hackernews
     end
@@ -224,7 +224,7 @@ describe HNCollect do
 
   context "trigger Errno::ECONNREFUSED exception" do
     it "will exercise the Errno::ECONNREFUSED exception and check for proper handling" do
-      expect(HNCollect).to receive(:get_top_hit) { raise Errno::ECONNREFUSED }
+      expect(HNCollect).to receive(:get_top_hit_stories) { raise Errno::ECONNREFUSED }
       expect(HNCollect).to receive(:log_error).with(/connection refused/)
       HNCollect.load_data_from_hackernews
     end
@@ -232,7 +232,7 @@ describe HNCollect do
 
   context "trigger JSON::ParserError exception" do
     it "will exercise the JSON::ParserError exception and check for proper handling" do
-      expect(HNCollect).to receive(:get_top_hit) { raise JSON::ParserError }
+      expect(HNCollect).to receive(:get_top_hit_stories) { raise JSON::ParserError }
       expect(HNCollect).to receive(:log_error).with(/bad JSON data returned/)
       HNCollect.load_data_from_hackernews
     end
@@ -240,7 +240,7 @@ describe HNCollect do
 
   context "trigger HNCollect::ServerUnavaiable exception" do
     it "will exercise the HNCollect::ServerUnavailable exception and check for proper handling" do
-      expect(HNCollect).to receive(:get_top_hit) { raise HNCollect::ServerUnavailable }
+      expect(HNCollect).to receive(:get_top_hit_stories) { raise HNCollect::ServerUnavailable }
       expect(HNCollect).to receive(:log_error).with(/server unavailable/)
       expect(Kernel).to receive(:sleep).with(5) { raise StandardError }
       expect { HNCollect.load_data_from_hackernews }.to raise_error(StandardError)

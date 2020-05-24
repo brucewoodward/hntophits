@@ -25,6 +25,7 @@ class Story < ApplicationRecord
   end
 
   def self.process(hn_id:, date:, href:, description:)
+    Rails.logger.error "hn_id #{hn_id} date #{date} href #{href} description #{description}"
     story = Story.find_or_create_by!(hn_id: hn_id) do |r|
       r.href = href.blank? ? HackerNews.build_hacker_news_href(hn_id) : href
       r.description = description

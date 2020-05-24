@@ -1,10 +1,12 @@
 # vim: ft=ruby
 
+require 'rails_helper'
+
 require 'net/http'
 require 'net/https'
 require 'json'
 
-#require_relative 'hn_collect/cache'
+require_relative 'hn_collect/cache'
 
 module HNCollect
   include HNCollect::Cache
@@ -28,10 +30,16 @@ module HNCollect
 
   def load_data_from_hackernews
     time = Time.now
-    top_hit = get_top_hit
+    stories = get_top_hit_stories
+    top_hit = stories.first
+    story = Struct.new(:hn_id, :description, :href)
+    almost_stories = stories[1..9].map {|s| story.new(*get_story(s))}
     hn_id, description, href = get_top_hit_details(top_hit)
     puts "#{time}: #{hn_id} '#{description}' '#{href}'"
-    HackerNews.process_latest_hn_num_one(hn_id: hn_id, description: description, href: href, date: Time.now)
+
+    HackerNews.main(hn_id: hn_id, href: href, description: description,
+                    almost_stories: almost_stories, date: time)
+
   rescue ActiveRecord::RecordInvalid => e
     log_error "Bad Data: #{e}"
   rescue Net::ReadTimeout
@@ -44,6 +52,10 @@ module HNCollect
     log_error "server unavailable - retrying"
     Kernel.sleep 5
     retry
+  rescue => exception
+    Rails.logger.info exception.backtrace.join("\n")
+    Rails.logger.info exception.full_message
+    raise
   end
 
   def run_every_minute
@@ -85,6 +97,10 @@ module HNCollect
 
   def get_top_hit
     https_get('/v0/topstories.json').first
+  end
+
+  def get_top_hit_stories
+    https_get('/v0/topstories.json')
   end
 
   def get_story hn_id

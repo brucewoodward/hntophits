@@ -67,7 +67,8 @@ module LoadDB
   end
 
   def self.update_db(hn_id, date, href, description)
-    HackerNews.process_latest_hn_num_one(hn_id: hn_id, date: make_time(date), href: href, description: description)
+    story = OpenStruct.new(hn_id: hn_id, href: href, description: description)
+    HackerNews.process_latest_hn_num_one(story: story, date: Time.now)
   end
 
   # :nodoc:
