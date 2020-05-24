@@ -1,7 +1,5 @@
 # vim: ft=ruby
 
-require 'rails_helper'
-
 require 'net/http'
 require 'net/https'
 require 'json'
