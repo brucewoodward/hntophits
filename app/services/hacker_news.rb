@@ -10,11 +10,10 @@ module HackerNews
     story = Struct.new(:hn_id, :description, :href)
     # order here is critical, process_story still will create the story if needed.
     # process_latest_hn_num_one expects the story to exist.
-    story_from_db = HackerNews.process_story(story.new(hn_id, description, href),
+    story_from_db = HackerNews.process_story(story: story.new(hn_id, description, href),
                                              date: date)
     HackerNews.process_latest_hn_num_one(story: story_from_db, date: date)
-    HackerNews.process_almost_stories(stories: almost_stories,
-                                      dbstory: story_from_db)
+    HackerNews.process_almost_stories(stories: almost_stories)
   end
   
   def self.process_story(story:, date:)
@@ -31,8 +30,8 @@ module HackerNews
     end
   end
 
-  def self.process_almost_stories(stories:, dbstory:)
-    Story.process_almost_stories(stories, dbstory)
+  def self.process_almost_stories(stories:)
+    AlmostStory.process_almost_stories(stories)
   end
 
   def self.build_hacker_news_href hn_id
