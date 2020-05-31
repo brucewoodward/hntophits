@@ -28,7 +28,7 @@ gem 'jbuilder', '~> 2.5'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc
 
-gem 'kaminari'
+gem 'kaminari', '>= 1.2.1'
 
 gem 'bootstrap-sass'
 gem 'autoprefixer-rails'
