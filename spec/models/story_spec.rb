@@ -70,10 +70,9 @@ RSpec.describe Story, type: :model do
 
     context "successful use" do
       it "will return story that has been populated as expected (correctly)" do
-        date = Time.now
         description = "description"
         href = "href"
-        story = Story.process(hn_id: 1, date: date, description: description, href: href)
+        story = Story.process(hn_id: 1, description: description, href: href)
         expect(story.hn_id).to eq 1
         expect(story.description).to eq description
         expect(story.href).to eq href
@@ -83,7 +82,7 @@ RSpec.describe Story, type: :model do
     context "the story exists but the description has changed" do
       it "will update the story with the new description" do
         story = create(:story, hn_id: 1, description: "original description")
-        Story.process(hn_id: 1, date: Time.now, href: "https//nowhere.com", description: "new description")
+        Story.process(hn_id: 1, href: "https//nowhere.com", description: "new description")
         expect(Story.first.description).to eq "new description"
       end
     end
@@ -91,7 +90,7 @@ RSpec.describe Story, type: :model do
     context "the story doesn't exist before processsing and it's description is stored as provided" do
       it "will find that the description is as provided" do
         story = create(:story, hn_id: 1, description: "original description")
-        Story.process(hn_id: 1, date: Time.now, href: "https//nowhere.com", description: "original description")
+        Story.process(hn_id: 1, href: "https//nowhere.com", description: "original description")
         expect(Story.first.description).to eq "original description"
       end
     end
@@ -100,7 +99,7 @@ RSpec.describe Story, type: :model do
       context "hacker news id is invalid" do
         it "should throw ActiveRecord::RecordInvalid" do
           expect {
-            Story.process(hn_id: "a string", date: Time.now, description: "description", href: nil)
+            Story.process(hn_id: "a string", description: "description", href: nil)
           }.to raise_error(ActiveRecord::RecordInvalid)
           expect(Story.count).to eq 0
         end
@@ -109,7 +108,7 @@ RSpec.describe Story, type: :model do
       context "href is nil or empty string" do
         it "will create href with the default" do
           hn_id = 1
-          story = Story.process(hn_id: hn_id, date: Time.now, description: "description", href: nil)
+          story = Story.process(hn_id: hn_id, description: "description", href: nil)
           expect(story.valid?).to be true
           expect(story.href).to eq HackerNews.build_hacker_news_href(hn_id)
           expect(story.description).to eq "description"
@@ -117,7 +116,7 @@ RSpec.describe Story, type: :model do
 
         it "will create href with the default" do
           hn_id = 1
-          story = Story.process(hn_id: hn_id, date: Time.now, description: "description", href: '')
+          story = Story.process(hn_id: hn_id, description: "description", href: '')
           expect(story.valid?).to be true
           expect(story.href).to eq HackerNews.build_hacker_news_href(hn_id)
           expect(story.description).to eq "description"
@@ -127,7 +126,7 @@ RSpec.describe Story, type: :model do
       context "description is nil is invalid" do
         it "should throw ActiveRecord::RecordInvalid" do
           expect {
-            Story.process(hn_id: "a string", date: Time.now, description: nil, href: nil)
+            Story.process(hn_id: "a string", description: nil, href: nil)
           }.to raise_error(ActiveRecord::RecordInvalid)
           expect(Story.count).to eq 0
         end

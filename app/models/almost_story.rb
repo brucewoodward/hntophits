@@ -10,6 +10,7 @@ class AlmostStory < ApplicationRecord
       r.href = href.blank? ? HackerNews.build_hacker_news_href(hn_id) : href
       r.description = description
     end
+    Rails.logger.error "inside almoststory.process #{story.inspect}"
     story.description = description if story.description != description
     story.save
     story
@@ -17,13 +18,21 @@ class AlmostStory < ApplicationRecord
 
   def self.process_almost_stories(stories)
     stories.each do |story|
-      s = Story.where(hn_id: story.hn_id).first
-      if s and AlmostStory.where(hn_id: story.hn_id).count > 0
-        AlmostStory.where(hn_id: story.hn_id).destroy_all
-      elsif AlmostStory.where(hn_id: story.hn_id).empty? # new entry in almost story
-        AlmostStory.process(hn_id: story.hn_id,
-                            href: story.href,
-                            description: story.description)
+
+      seen_story_before = Story.where(hn_id: story.hn_id).first
+      story_is_in_almoststory = AlmostStory.where(hn_id: story.hn_id).count > 0
+
+      Rails.logger.error "seen_story_before #{seen_story_before.inspect}"
+      if seen_story_before
+        if story_is_in_almoststory
+          # remove it, because the story has been #1 at some point
+          AlmostStory.where(hn_id: story.hn_id).destroy_all
+        end
+      else
+        Rails.logger.error "running almoststory.process"
+        AlmostStory.process(hn_id: story.hn_id, # add story
+                                href: story.href,
+                                description: story.description)
       end
     end
   end

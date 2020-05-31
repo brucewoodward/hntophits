@@ -4,8 +4,6 @@ require 'rails_helper'
 
 RSpec.describe HackerNews do
 
-  story = Struct.new(:hn_id, :href, :description)
-
   context "process_latest_hn_num_one: there is a new story at the top" do
 
     it "should have a new story as number one in top_hits" do
@@ -20,14 +18,14 @@ RSpec.describe HackerNews do
 
   context "process_latest_hn_num_one: there isn't new story at the top" do
     it "should have added more time to the current top story in top_hits" do
+      story = Struct.new(:hn_id, :href, :description)
       current_top_story_raw = story.new(656565, "http://people.com", "description")
-      current_top_story = HackerNews.process_story(story: current_top_story_raw, date: Time.now)
+      current_top_story = HackerNews.process_story(story: current_top_story_raw)
       HackerNews.process_latest_hn_num_one(story: current_top_story, date: Time.now)
       expect(current_top_story.time_at_num_one).to eq 1
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
       expect(TopHit.current_top_hit.story.time_at_num_one).to eq 1
-      current_top_story = HackerNews.process_story(story: current_top_story_raw,
-                                                   date: Time.now + 1.minute)
+      current_top_story = HackerNews.process_story(story: current_top_story_raw)
       HackerNews.process_latest_hn_num_one(story: current_top_story, date: Time.now + 1.minute)
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
       expect(TopHit.current_top_hit.story.time_at_num_one).to eq 2
@@ -36,18 +34,18 @@ RSpec.describe HackerNews do
 
   context "simulate the current story getting more time at number one followed by a new story entering the picture" do
     it "should have a new story as number one in top_hits" do
+      story = Struct.new(:hn_id, :href, :description)
       time = Time.now
       current_top_story_raw = story.new(656565, "http://poop.com", "garbage")
 
       expect(Story.count).to eq 0
-      current_top_story = HackerNews.process_story(story: current_top_story_raw, date: time)
+      current_top_story = HackerNews.process_story(story: current_top_story_raw)
       expect(Story.count).to eq 1
       HackerNews.process_latest_hn_num_one(story: current_top_story, date: time)
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
       expect(TopHit.current_top_hit.story.time_at_num_one).to eq 1
 
-      current_top_story = HackerNews.process_story(story: current_top_story_raw,
-                                                   date: time + 1.minute)
+      current_top_story = HackerNews.process_story(story: current_top_story_raw)
       HackerNews.process_latest_hn_num_one(story: current_top_story,
                                            date: time + 1.minute)
       expect(TopHit.current_top_hit.story.hn_id).to eq 656565
@@ -55,8 +53,7 @@ RSpec.describe HackerNews do
 
       new_top_story_raw = story.new(88888, "http://newtopstory.com", "blahblah")
       expect(Story.count).to eq 1
-      new_top_story = HackerNews.process_story(story: new_top_story_raw,
-                                               date: time + 2.minutes)
+      new_top_story = HackerNews.process_story(story: new_top_story_raw)
       expect(Story.count).to eq 2
       HackerNews.process_latest_hn_num_one(story: new_top_story,
                                            date: time + 2.minutes)
