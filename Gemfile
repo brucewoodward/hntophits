@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2', '>= 5.2.4.3'
+gem 'rack', '>= 2.2.3'
 
 gem 'bootsnap', '~> 1.4'
 
@@ -25,8 +26,11 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
+gem 'json', '>= 2.3.0'
 # bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0',          group: :doc
+gem 'sdoc', '~> 1.1.0',          group: :doc
+
+gem 'websocket-extensions', '>= 0.1.5'
 
 gem 'kaminari', '>= 1.2.1'
 
