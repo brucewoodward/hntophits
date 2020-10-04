@@ -37,4 +37,9 @@ class AlmostStory < ApplicationRecord
     end
   end
 
+  def self.remove_top_story(top_story)
+    # remote current number one story from the almost_stories table.
+    AlmostStory.where(hn_id: top_story.hn_id).destroy_all
+  end
+
 end
