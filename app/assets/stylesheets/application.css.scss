@@ -47,9 +47,9 @@ body {
   background-color: #324b81;
 
   h1 { 
-    letter-spacing: -5px;
+    letter-spacing: -0.15rem;
     margin: 5px;
-    font-size: 3.3rem;
+    font-size: 4.4rem;
     font-weight: 800;
   }
   a:link {
@@ -73,6 +73,7 @@ body {
 .what-is-info {
   width: 100%;
   color: #FFF0E0;
+  margin-top: 0.75rem;
   margin-bottom: 0;
   a:link {
     text-decoration: none;
