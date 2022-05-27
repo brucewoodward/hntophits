@@ -296,7 +296,7 @@ DEPENDENCIES
   kaminari (>= 1.2.1)
   listen (~> 3.0.5)
   mini_racer
-  nokogiri (>= 1.10.8)
+  nokogiri (~> 1.13, >= 1.13.6)
   pg
   puma (>= 4.3.5)
   rack (>= 2.2.3)

@@ -62,7 +62,7 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # local
-gem 'nokogiri', '>= 1.10.8'
+gem 'nokogiri', '~> 1.13', '>= 1.13.6'
 gem 'pg'
 
 group :development, :test do
